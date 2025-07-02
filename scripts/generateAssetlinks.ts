@@ -74,10 +74,18 @@ function main() {
     fs.mkdirSync(wellKnownDir, { recursive: true });
   }
 
-  // Write to file with proper formatting
+  // Write to file with ultra-minified JSON (remove all unnecessary spaces)
   const filePath = path.join(wellKnownDir, "assetlinks.json");
-  const jsonContent = JSON.stringify(statements, null, 2);
+  const jsonContent = JSON.stringify(statements).replace(/\s+/g, "");
   fs.writeFileSync(filePath, jsonContent);
+
+  // Also write to public directory for static serving
+  const publicWellKnownDir = path.join(process.cwd(), "public", ".well-known");
+  if (!fs.existsSync(publicWellKnownDir)) {
+    fs.mkdirSync(publicWellKnownDir, { recursive: true });
+  }
+  const publicFilePath = path.join(publicWellKnownDir, "assetlinks.json");
+  fs.writeFileSync(publicFilePath, jsonContent);
 
   console.log(`Generated assetlinks.json with ${numApps} apps`);
   console.log(`File size: ${jsonContent.length} bytes`);
